@@ -34,6 +34,17 @@ def version_tuple(value):
     return result
 
 
+def validate_notification(event):
+    payload = event.get('client_payload', {})
+    tag = payload.get('tag', '')
+    if (payload.get('product') != 'eaclip' or
+            payload.get('repository') != 'ceastld/eaclip' or
+            not isinstance(tag, str) or not tag.startswith('rust-v')):
+        raise ValueError('Invalid eaclip release notification')
+    version_tuple(tag.removeprefix('rust-v'))
+    return tag
+
+
 def build_manifest(release):
     if release.get("draft") is not False or release.get("prerelease") is not False:
         raise ValueError("Only published stable releases may advance the API")
@@ -106,8 +117,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--verify-api", action="store_true")
     parser.add_argument("--attempts", type=int, default=1)
+    parser.add_argument("--validate-notification", type=Path)
     args = parser.parse_args()
-    if args.verify_api:
+    if args.validate_notification:
+        event = json.loads(args.validate_notification.read_text(encoding='utf-8'))
+        print('Accepted release notification:', validate_notification(event))
+    elif args.verify_api:
         expected = json.loads(MANIFEST.read_text(encoding="utf-8"))
         for attempt in range(max(1, args.attempts)):
             try:

@@ -4,7 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from sync_eaclip import build_manifest, encode, sync, verify
+from sync_eaclip import build_manifest, encode, sync, validate_notification, verify
 
 
 def release(version="0.32.5"):
@@ -24,6 +24,16 @@ def release(version="0.32.5"):
 
 
 class UpdateApiTests(unittest.TestCase):
+    def test_release_notifications_require_the_expected_product_repository_and_stable_tag(self):
+        event = {'client_payload': {'product': 'eaclip', 'repository': 'ceastld/eaclip', 'tag': 'rust-v0.32.6'}}
+        self.assertEqual(validate_notification(event), 'rust-v0.32.6')
+        for field, value in [('product', 'raishot'), ('repository', 'ceastld/other'),
+                             ('tag', 'rust-v0.32.6-beta'), ('tag', '../main'), ('tag', None)]:
+            bad = copy.deepcopy(event)
+            bad['client_payload'][field] = value
+            with self.subTest(field=field, value=value), self.assertRaises(ValueError):
+                validate_notification(bad)
+
     def test_new_release_advances_version_and_all_asset_addresses(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "version.json"

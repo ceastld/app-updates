@@ -4,8 +4,6 @@ on:
   workflow_dispatch:
   repository_dispatch:
     types: [release-published]
-  schedule:
-    - cron: '7,22,37,52 * * * *'
   push:
     branches: [main]
     paths: ['public/**', 'scripts/**', 'wrangler.toml', 'package*.json', '.github/workflows/update-api.yml']
@@ -31,6 +29,9 @@ jobs:
           python-version: '3.12'
       - name: Test manifest generation and stale API detection
         run: python -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Validate the release notification
+        if: github.event_name == 'repository_dispatch'
+        run: python scripts/sync_eaclip.py --validate-notification "$GITHUB_EVENT_PATH"
       - name: Synchronize the latest complete stable eaclip Release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -50,7 +51,7 @@ jobs:
             git push origin HEAD:main
             deploy=true
           fi
-          if [[ "$EVENT_NAME" != schedule ]] || ! python scripts/sync_eaclip.py --verify-api; then
+          if [[ "$EVENT_NAME" == push || "$EVENT_NAME" == workflow_dispatch ]] || ! python scripts/sync_eaclip.py --verify-api; then
             deploy=true
           fi
           echo "deploy=$deploy" >> "$GITHUB_OUTPUT"

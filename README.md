@@ -19,15 +19,17 @@
 
 ## EA Clip 自动同步
 
-GitHub Actions 的 [update-api.yml](.github/workflows/update-api.yml) 每 15 分钟检查 `ceastld/eaclip` 最新正式 Release，也支持手动执行和 `release-published` repository dispatch。GitHub 的定时调度可能延迟；客户端启动后检查一次，此后每 5 小时检查。
+正式发版流程在 Release 及附件校验成功后，通过 `release-published` repository dispatch 主动通知 [update-api.yml](.github/workflows/update-api.yml)，随即同步版本清单并部署。没有服务端定时轮询；手动发布的正式 Release 也由发布仓库的 `release: published` 事件通知，支持手动补发失败通知。客户端启动后检查一次，此后每 5 小时检查。
 
 只有正式 x64 便携 ZIP、构建清单、SHA256SUMS 三个附件完整上传，且 ZIP 有 GitHub SHA-256 摘要时，才自动更新 `public/eaclip/version.json` 并提交。清单包含 `sha256`、`size` 和版本说明，客户端正常检查只需一个小 JSON；安装包仍直接从 GitHub 或镜像下载。脚本拒绝倒退版本、草稿、预发布、错误产品地址和同版本包摘要变化。
 
-清单或部署配置变化时自动部署 Workers 静态资源，随后读回正式 API 验证版本、完整正文及 JSON/CORS 响应头。未变更的定时检查不提交、不部署；部署失败后，下次发现服务与仓库不一致会重试。其它产品清单保持手动维护，push `main` 后同样自动部署。
+清单或部署配置变化时自动部署 Workers 静态资源，随后读回正式 API 验证版本、完整正文及 JSON/CORS 响应头。重复或迟到通知读取最新正式版本，清单及服务均未变更时不提交、不部署。失败时重跑该次 Actions，或手动补发通知；不使用定时任务重试。其它产品清单保持手动维护，push `main` 后同样自动部署。
 
 部署须在本仓库 Actions Secrets 中配置 `CLOUDFLARE_API_TOKEN`，授予对应账户的 Workers 部署权限，再将仓库 Actions Variable `UPDATE_API_ENABLED` 设为 `true` 以启用自动任务；账户 ID 已在 `wrangler.toml` 中。未配置凭据时自动任务保持关闭，手动执行仍可检查部署设置。密钥不写入源码。流程参考 [Cloudflare GitHub Actions 文档](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)。
 
 2026-10-30 已配置独立部署凭据并启用自动任务。[首次实际运行](https://github.com/ceastld/app-updates/actions/runs/41110774093)通过清单回归、正式版本同步、Cloudflare 部署与线上 `0.32.5.0` 读回校验。
+
+发布仓库 `ceastld/eaclip` 的 `APP_UPDATES_DISPATCH_TOKEN` Secret 只授予本仓库的 `Contents: write`，用于发送跨仓库通知；内置 `GITHUB_TOKEN` 仅限其所在仓库，不能替代该凭据。发布主工作流显式调用通知，覆盖 `GITHUB_TOKEN` 创建 Release 不触发另一条 `release` 工作流的情形。
 
 ## 本地验证与部署
 
