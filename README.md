@@ -31,6 +31,8 @@
 
 发布仓库 `ceastld/eaclip` 的 `APP_UPDATES_DISPATCH_TOKEN` Secret 只授予本仓库的 `Contents: write`，用于发送跨仓库通知；内置 `GITHUB_TOKEN` 仅限其所在仓库，不能替代该凭据。发布主工作流显式调用通知，覆盖 `GITHUB_TOKEN` 创建 Release 不触发另一条 `release` 工作流的情形。
 
+推送链路已用现有正式版 `rust-v0.32.5` 实测：[发布仓库主动通知](https://github.com/ceastld/eaclip/actions/runs/41117864943)与[本仓库事件处理](https://github.com/ceastld/app-updates/actions/runs/41117885115)均成功。接收任务通过四项回归并读回线上 `0.32.5.0`；重复通知的清单和 API 均未变化，正确跳过部署。没有创建测试 Release。
+
 ## 本地验证与部署
 
 ```bash
