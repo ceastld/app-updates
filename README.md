@@ -27,6 +27,8 @@ GitHub Actions 的 [update-api.yml](.github/workflows/update-api.yml) 每 15 分
 
 部署须在本仓库 Actions Secrets 中配置 `CLOUDFLARE_API_TOKEN`，授予对应账户的 Workers 部署权限，再将仓库 Actions Variable `UPDATE_API_ENABLED` 设为 `true` 以启用自动任务；账户 ID 已在 `wrangler.toml` 中。未配置凭据时自动任务保持关闭，手动执行仍可检查部署设置。密钥不写入源码。流程参考 [Cloudflare GitHub Actions 文档](https://developers.cloudflare.com/workers/ci-cd/external-cicd/github-actions/)。
 
+2026-10-30 已配置独立部署凭据并启用自动任务。[首次实际运行](https://github.com/ceastld/app-updates/actions/runs/41110774093)通过清单回归、正式版本同步、Cloudflare 部署与线上 `0.32.5.0` 读回校验。
+
 ## 本地验证与部署
 
 ```bash
