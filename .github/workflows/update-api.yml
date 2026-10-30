@@ -1,0 +1,76 @@
+name: Synchronize and deploy update API
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [release-published]
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  push:
+    branches: [main]
+    paths: ['public/**', 'scripts/**', 'wrangler.toml', 'package*.json', '.github/workflows/update-api.yml']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-api-production
+  cancel-in-progress: false
+
+jobs:
+  sync-and-deploy:
+    if: vars.UPDATE_API_ENABLED == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test manifest generation and stale API detection
+        run: python -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Synchronize the latest complete stable eaclip Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/sync_eaclip.py
+      - name: Commit manifest and decide whether deployment is needed
+        id: plan
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          git add public/eaclip/version.json
+          deploy=false
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'chore(updates): 同步 EA Clip 正式版本清单'
+            git push origin HEAD:main
+            deploy=true
+          fi
+          if [[ "$EVENT_NAME" != schedule ]] || ! python scripts/sync_eaclip.py --verify-api; then
+            deploy=true
+          fi
+          echo "deploy=$deploy" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        if: steps.plan.outputs.deploy == 'true'
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install pinned deployment tooling
+        if: steps.plan.outputs.deploy == 'true'
+        run: npm ci
+      - name: Deploy static update API
+        if: steps.plan.outputs.deploy == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [[ -z "$CLOUDFLARE_API_TOKEN" ]]; then
+            echo 'Configure the CLOUDFLARE_API_TOKEN Actions secret with Workers deployment permission.' >&2
+            exit 1
+          fi
+          npm run deploy
+      - name: Verify the public API serves the synchronized version
+        run: python scripts/sync_eaclip.py --verify-api --attempts 40
