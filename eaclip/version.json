@@ -1,0 +1,9 @@
+{
+  "product": "eaclip",
+  "release": "0.32.5",
+  "version": "0.32.5.0",
+  "publishedAt": "2026-10-29T15:09:33Z",
+  "downloadUrl": "https://github.com/ceastld/eaclip/releases/download/rust-v0.32.5/eaclip-0.32.5-windows-x64.zip",
+  "sha256SumsUrl": "https://github.com/ceastld/eaclip/releases/download/rust-v0.32.5/eaclip-0.32.5-windows-x64.SHA256SUMS.txt",
+  "notes": "ClipHost 0.32.5 (GPUI)"
+}

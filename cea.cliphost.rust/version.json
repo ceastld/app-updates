@@ -1,0 +1,11 @@
+{
+  "release": "0.32.5",
+  "build": 0,
+  "packageName": "cea.cliphost.rust",
+  "version": "0.32.5.0",
+  "launcherVersion": "0.31.7.0",
+  "CeaQuicker": "0.31.7.0",
+  "zipFileName": "ClipHostRust.0.32.5.0.zip",
+  "ClipHostRust": "0.32.5.0",
+  "downloadUrl": "https://github.com/ceastld/eaclip/releases/download/rust-v0.32.5/eaclip-0.32.5-windows-x64.zip"
+}

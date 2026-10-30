@@ -1,0 +1,10 @@
+{
+  "release": "0.31.26",
+  "build": 0,
+  "packageName": "cea.cliphost.rust.arm64",
+  "version": "0.31.26.0",
+  "launcherVersion": "0.31.14.1",
+  "CeaQuicker": "0.31.14.1",
+  "zipFileName": "ClipHostRust.0.31.26.0.zip",
+  "ClipHostRust": "0.31.26.0"
+}
