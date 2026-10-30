@@ -1,0 +1,13 @@
+name = "app-updates"
+account_id = "4854fbdb97272c4e1d739db8d96ddfc3"
+compatibility_date = "2026-10-30"
+workers_dev = false
+
+# Version-check API: static JSON only (no Worker script).
+[assets]
+directory = "./public"
+not_found_handling = "404-page"
+
+[[routes]]
+pattern = "update.alinko.cc"
+custom_domain = true
