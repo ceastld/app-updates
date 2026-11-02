@@ -9,6 +9,7 @@
 | 产品 | URL |
 |------|-----|
 | EA Clip / ClipHost | `https://update.alinko.cc/eaclip/version.json` |
+| OmniTrigger | `https://update.alinko.cc/omnitrigger/version.json` |
 | RaiShot | `https://update.alinko.cc/raishot/version.json` |
 | cea.cliphost | `https://update.alinko.cc/cea.cliphost/version.json` |
 | cea.cliphost.rust | `https://update.alinko.cc/cea.cliphost.rust/version.json` |
@@ -33,14 +34,24 @@
 
 推送链路已用现有正式版 `rust-v0.32.5` 实测：[发布仓库主动通知](https://github.com/ceastld/eaclip/actions/runs/41117864943)与[本仓库事件处理](https://github.com/ceastld/app-updates/actions/runs/41117885115)均成功。接收任务通过四项回归并读回线上 `0.32.5.0`；重复通知的清单和 API 均未变化，正确跳过部署。没有创建测试 Release。
 
+## OmniTrigger 发布同步
+
+OmniTrigger 复用同一 Workers 静态资源、域名和部署作业。`scripts/sync_omnitrigger.py` 从官方仓库最近 100 条公开发行中按 SemVer 选择最高版本；包含预发布版，与该产品现有 Windows 预览渠道一致。仅当 ZIP、SHA256SUMS 均上传完整，且 ZIP 有 GitHub SHA-256 摘要时才更新清单；拒绝版本倒退与同版本 ZIP 摘要变化。
+
+清单沿用 `product`、`release`、`version`、`publishedAt`、`downloadUrl`、`sha256SumsUrl`、`sha256`、`size`、`notes` 字段。`release` 为 Cargo SemVer；纯三段数字的 `version` 追加 `.0`，带预发布后缀时保持原 SemVer。客户端正常检查只需一个小 JSON；下载仍使用原始 GitHub 发行包。
+
+公开发行完成后，发布仓库向本仓库发送 `release-published` 通知，载荷为 `product=omnitrigger`、`repository=ceastld/omnitrigger`、`tag=v<版本>`。接收作业校验产品与标签身份，运行两种产品的同步和回归，通过同一 Cloudflare 作业部署并分别读回验证。现有 EA Clip 通知与稳定版本规则保持原样。发布仓库需要配置仅对本仓库具有 Contents: write 权限的 `APP_UPDATES_DISPATCH_TOKEN`，不能使用仅限发布仓库的内置 `GITHUB_TOKEN`。
+
+`scripts/sync_updates.py` 统一运行两种自动同步产品；其他产品清单仍手动维护。不新增服务端轮询、不创建产品 Release。
+
 ## 本地验证与部署
 
 ```bash
 python -m unittest discover -s scripts -p 'test_*.py' -v
-python scripts/sync_eaclip.py
+python scripts/sync_updates.py
 npm ci
 npm run deploy
-python scripts/sync_eaclip.py --verify-api --attempts 40
+python scripts/sync_updates.py --verify-api --attempts 40
 ```
 
 本地使用已登录的 Wrangler，或通过环境变量 `CLOUDFLARE_API_TOKEN` 注入部署密钥。不会上传安装包，也不会创建或修改产品 Release。

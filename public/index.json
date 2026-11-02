@@ -3,6 +3,7 @@
   "base": "https://update.alinko.cc",
   "products": [
     "/eaclip/version.json",
+    "/omnitrigger/version.json",
     "/raishot/version.json",
     "/cea.cliphost/version.json",
     "/cea.cliphost.rust/version.json",
