@@ -1,11 +1,11 @@
 {
   "product": "omnitrigger",
-  "release": "0.1.0",
-  "version": "0.1.0.0",
-  "publishedAt": "2026-10-27T17:17:10Z",
-  "downloadUrl": "https://github.com/ceastld/omnitrigger/releases/download/v0.1.0/OmniTrigger-0.1.0-windows-x86_64.zip",
-  "sha256SumsUrl": "https://github.com/ceastld/omnitrigger/releases/download/v0.1.0/SHA256SUMS.txt",
-  "sha256": "9d2205b0e3401c70ac413c016e238325654ee0f3ccbe7e2c203318bd3990ad78",
-  "size": 7708457,
-  "notes": "# OmniTrigger v0.1.0 · Windows 预览版\n\n首个 Windows x64 开发预览版，API 和配置格式仍可能调整。\n\n## 下载与运行\n\n下载 `OmniTrigger-0.1.0-windows-x86_64.zip`，完整解压后运行 `omnitrigger.exe`。使用 `SHA256SUMS.txt` 中的 SHA-256 核对 ZIP；包内包含项目许可证、依赖许可及第三方通知。\n\n建议使用 Windows 11 x64；Windows 10 尚未完成全面兼容验证。本版本需要 [Microsoft Visual C++ v14 Redistributable x64](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist)，无需 Rust 或开发工具。程序未经代码签名，未提供安装器或自动更新。\n\n首次启动加载示例，配置保存在 `%LOCALAPPDATA%\\OmniTrigger`。需要隔离试用时，可使用 `omnitrigger.exe --config <独立目录>\\bindings.json`。\n\n## 主要功能\n\n- 键盘与鼠标组合录制、注册、冲突检查，以及长按、快速拖拽和鼠标区域条件。\n- 触发器管理、23 个可编辑预设、浮动触发面板，以及支持多圈布局与按应用切换的动作轮盘。\n- 本地提示、快捷键、本地步骤、窗口操作、系统音量和硬件亮度调节、外部程序及脚本。\n- 本地配置保存与旧版迁移备份、输入诊断、暂停 / 恢复与监听重建。\n- 可选截图插件适配。截图程序按用户操作另行下载，未合并进本发行包；下载源可能需要相应仓库访问权限。\n\n## 已知限制与验证范围\n\n输入补发会改变时序，不能保证无损恢复；系统保留组合、安全桌面、其他软件的输入拦截及不同权限窗口仍受 Windows 限制。亮度调节依赖硬件和驱动支持。外部程序退出不代表其业务操作已完成，暂停或退出也不会终止已经启动的外部程序。\n\n当前没有双击 / 连击、按设备区分、系统托盘、插件市场或自动更新。测试动作会真实发送输入、修改剪贴板、改变设备设置或启动程序；配置保存本身不执行动作。\n\n本地在 Windows 11（系统内部版本 26200）完成工作区测试、格式检查、Clippy、应用构建、示例配置和真实 Hook 安装 / 卸载检查。发布流程还会在 Windows runner 执行自动检查后才公开资产。自动化检查不覆盖全部图形交互、显示器、驱动和权限组合，也不等于完成干净终端用户环境的全面验证。\n\n\n源码提交：140d6a5f35100e915dbb754fad989ada6a454cca\n构建记录：https://github.com/ceastld/omnitrigger/actions/runs/40546171379\n"
+  "release": "0.2.1",
+  "version": "0.2.1.0",
+  "publishedAt": "2026-11-13T09:34:36Z",
+  "downloadUrl": "https://github.com/ceastld/omnitrigger/releases/download/v0.2.1/OmniTrigger-0.2.1-windows-x86_64.zip",
+  "sha256SumsUrl": "https://github.com/ceastld/omnitrigger/releases/download/v0.2.1/SHA256SUMS.txt",
+  "sha256": "36a8bfeaca83dd2e27fdf637194d4ae149da96c823d89d6e205800cfa38d1c0c",
+  "size": 10290005,
+  "notes": "# OmniTrigger v0.2.1 · Windows 预览版\n\n## 安装与配置\n\n下载 `OmniTrigger-0.2.1-windows-x86_64-setup.exe`，按向导安装到当前 Windows 用户。开始菜单的 **OmniTrigger** 打开日常配置。原有绑定、动作目录、轮盘和外观仍从 `%LOCALAPPDATA%\\OmniTrigger` 读取，卸载和重装均保留。\n\n**OmniTrigger 测试** 打开独立的本机测试配置档。首次使用加载示例，之后保留上次编辑的内容，窗口标题显示测试标识。测试实例默认关闭键鼠监听，可以和日常实例并用。配置按本机 Windows 用户保存。\n\n便携版使用 `OmniTrigger-0.2.1-windows-x86_64.zip`。两种下载的摘要均见 `SHA256SUMS.txt`。建议使用 Windows 11 x64，需要 Microsoft Visual C++ v14 x64 运行库。安装程序和应用均未签名。\n\n## 相比首个预览版\n\n- 日常主窗口关闭后收至托盘，键鼠监听继续工作。单击图标恢复窗口，右键菜单可退出。测试窗口关闭即退出。\n- 设置页可检查更新、校验下载并重启到新版。\n- 鼠标手势支持显示轨迹和形状匹配，动作轮盘可以按应用配置。\n- 动作包支持 JavaScript 入口。浏览器连接器、轻量脚本宿主等依赖沿用各自的安装方式。\n\n## 验证范围\n\n发行 CI 验证工作区、示例配置、依赖许可、安装与重装、开始菜单入口以及安装器和便携 ZIP 的 SHA-256。系统保留组合、权限较高的窗口、第三方 Hook 和显示器驱动仍会影响实际行为。Windows 10 和不同硬件组合的完整兼容性尚待验证。\n\n\n源码提交：6acdf244a610c2b5de6a4a55333abe5b31c51374\n构建记录：https://github.com/ceastld/omnitrigger/actions/runs/43399396413\n"
 }
